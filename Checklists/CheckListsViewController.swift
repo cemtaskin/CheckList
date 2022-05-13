@@ -7,7 +7,24 @@
 
 import UIKit
 
-class CheckListsViewController: UITableViewController {
+class CheckListsViewController: UITableViewController, AddItemViewControllerDelegate {
+    func addItemViewControllerDidCancel(_ controller: AddItemViewController) {
+        dismiss(animated: true)
+    }
+    
+    func addItemViewController(_ controller: AddItemViewController, didFinishAdding item: ChecklistItem) {
+       
+        
+        let newRowIndex = items.count
+        items.append(item)
+        
+        let indexPath = IndexPath(row:newRowIndex,section: 0)
+        
+        let indexPaths = [indexPath]
+        tableView.insertRows(at: indexPaths, with: .automatic)
+        dismiss(animated: true)
+    }
+    
     
     var items  :[ChecklistItem]
     override func viewDidLoad() {
@@ -17,6 +34,14 @@ class CheckListsViewController: UITableViewController {
         var item0 = ChecklistItem()
         item0.text="Walk the dog"
         items.append(item0)
+        
+        var item1 = ChecklistItem()
+        item1.text="Brush the teeth"
+        items.append(item1)
+        
+        var item2 = ChecklistItem()
+        item2.text="Read book"
+        items.append(item2)
     }
 
     required init?(coder: NSCoder) {
@@ -37,6 +62,30 @@ class CheckListsViewController: UITableViewController {
         
         return cell
         
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+       
+        let item = items[indexPath.row]
+        
+        item.checked = !item.checked
+        
+        let cell = tableView.cellForRow(at: indexPath)
+        
+        cell?.accessoryType = item.checked ? .checkmark : .none
+        
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        print(segue.identifier)
+        if (segue.identifier! == "AddItem"){
+            let navigationController = segue.destination as! UINavigationController
+            
+            let controller  = navigationController.topViewController as! AddItemViewController
+            
+            controller.delegate = self
+        }
     }
 
 }
